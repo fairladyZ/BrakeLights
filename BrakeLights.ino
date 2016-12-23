@@ -26,7 +26,7 @@
   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 
   A special thanks to Matt H. for taking intangible sloppy code, throwing it all away
-  and recreating this well commented simple demo.
+  and recreating this well documented simple demo.
   
   */
 
@@ -40,7 +40,7 @@
 #define RIGHT_INNER     2
 #define RIGHT_OUTER     3
 
-#define CR2LED         1
+#define HEADLIGHT         1
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
@@ -48,7 +48,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800
 int off[]          = {  0,   0,   0};
 int redDim[]       = { 10,   0,   0};
 int red[]          = { 25,   0,   0};
-int redBright[]    = {160,   0,   0};
+int redBright[]    = {70,   0,   0};
 int redXBright[]   = {240,   0,   0};
 int white[]        = {200, 150, 130};
 int orangeBright[] = {250,  40,   0};
@@ -57,15 +57,18 @@ int orangeBright[] = {250,  40,   0};
 void setup() {
   strip.begin(); // This initializes the NeoPixel library.
 
-  pinMode(CR2LED, OUTPUT);
-  digitalWrite(CR2LED, HIGH);
+  pinMode(HEADLIGHT, OUTPUT);
+  digitalWrite(HEADLIGHT, LOW);
 }
 
 void loop() {
   int i;
-  
+  int turnTimer;
+
+  //Set all addressable LEDs to OFF
   clear();
   strip.show();
+  delay(3000);
 
   // Car turned on
   setTailLights(redDim);
@@ -91,6 +94,11 @@ void loop() {
 
   delay(3000);
 
+  //Headlights On
+  digitalWrite(HEADLIGHT, HIGH);
+
+  delay(1500);
+
   // Goes into reverse
   setTailLights(redXBright, white);
 
@@ -103,8 +111,18 @@ void loop() {
   
   // Brakes applied
   setTailLights(redXBright, white);
+
+  delay(1000);
+
+  // Brakes released
+  setTailLights(red, white);
+
+  delay(750);
+
+  // Brakes applied
+  setTailLights(redXBright, white);
   
-  delay(500);
+  delay(1500);
   
   // Reverse released
   setTailLights(redXBright, red);
@@ -122,20 +140,80 @@ void loop() {
   delay(1500);
 
   // Right turn signal applied
-  int turnTimer = 600;
-  // 5 times
-  for(i=0; i<6; i++) {
+  turnTimer = 600;
+  // 4 times
+  for(i=0; i<5; i++) {
     setTailLights(redXBright, red, orangeBright, orangeBright); // Turn signal
     delay(turnTimer);
-    setTailLights(redXBright, red, off, off); // Normal
+    setTailLights(redXBright, red, red, redXBright); // Normal
+    delay(turnTimer);
+  }
+  // Brakes released
+  // 2 more with breakes released
+  for(i=0; i<3; i++) {
+  setTailLights(red, red, orangeBright, orangeBright); // Turn signal, no brake
+  delay(turnTimer);
+  setTailLights(red, red, red, red);
+  delay(turnTimer);
+  }
+  // Turn signal released
+
+  delay(500);
+
+  //Drive forward for some time
+   setTailLights(red);
+   delay(5000);
+
+   // Brakes applied
+  setTailLights(redXBright, red);
+
+  delay(1500);
+
+  // Right turn signal applied
+  turnTimer = 600;
+  // 2 times
+  for(i=0; i<3; i++) {
+    setTailLights(redXBright, red, orangeBright, orangeBright); // Turn signal
+    delay(turnTimer);
+    setTailLights(redXBright, red, red, redXBright); // Normal
     delay(turnTimer);
   }
   // Brakes released
   // 5 more with breakes released
-  for(i=0; i<4; i++) {
+  for(i=0; i<6; i++) {
   setTailLights(red, red, orangeBright, orangeBright); // Turn signal, no brake
   delay(turnTimer);
-  setTailLights(red, red, off, off);
+  setTailLights(red, red, red, red);
+  delay(turnTimer);
+  }
+  // Turn signal released
+
+  delay(500);
+
+  //Drive forward for some time
+   setTailLights(red);
+   delay(5000);
+
+   // Brakes applied
+  setTailLights(redXBright, red);
+
+  delay(1500);
+
+  // Left turn signal applied with one bulb burned out
+  turnTimer = 200;
+  // 9 times
+  for(i=0; i<10; i++) {
+    setTailLights(redXBright, orangeBright, red, redXBright); // Turn signal
+    delay(turnTimer);
+    setTailLights(redXBright, red, red, redXBright); // Normal
+    delay(turnTimer);
+  }
+  // Brakes released
+  // 11 more with breakes released
+  for(i=0; i<12; i++) {
+  setTailLights(red, orangeBright, red, red); // Turn signal, no brake
+  delay(turnTimer);
+  setTailLights(red, red, red, red);
   delay(turnTimer);
   }
   // Turn signal released
@@ -149,12 +227,22 @@ void loop() {
   // Brakes applied
   setTailLights(redXBright, red);
 
-  delay(2000);
+  delay(3000);
 
   // Lights dim
   setTailLights(redBright, redDim);
 
-  delay(3000);
+  delay(4000);
+
+  // Headlights Off
+  digitalWrite(HEADLIGHT, LOW);
+
+  delay(500);
+
+  // Lights dim
+  setTailLights(redBright, off);
+
+  delay(2500);
 
   // Lights turn off
   setTailLights(off);
